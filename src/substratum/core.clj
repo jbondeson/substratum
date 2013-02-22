@@ -50,5 +50,14 @@
     (cons (first s)
           (lazy-seq (unchunk (rest s))))))
 
+(defn map->map
+  "Returns the result of applying concat to the result of applying map
+to f and colls and then building a map. Thus function f should return
+a collection."
+  [f & colls]
+  (apply hash-map
+         (apply concat
+                (apply map f colls))))
+
 (set! *warn-on-reflection* false)
 
