@@ -1,4 +1,4 @@
-(ns substratum.specialized.seq.weak-lazy
+(ns substratum.specialized.seq.weaklazy
   (:require [substratum.hash :as hash]
             [substratum.seq :as seq])
   (:import [clojure.lang IFn ISeq Seqable Sequential
@@ -99,9 +99,9 @@ how many times the function will be executed, or that and identical seq
 will be generated on every function that yields a `seq`."
   [& body]
   `(let [marker# (Object.)]
-     (substratum.specialized.seq.weak-lazy.WeakLazySeq. nil
+     (new substratum.specialized.seq.weaklazy.WeakLazySeq nil
             ~(list* '^:once fn* [] body)
-            (AtomicReference. marker#)
+            (java.util.concurrent.atomic.AtomicReference. marker#)
             false nil marker#)))
 
 
