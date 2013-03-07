@@ -9,4 +9,7 @@
                  [org.clojure/tools.logging "0.2.6"] 
                  [log4j/log4j "1.2.17"
                   :exclusions [javax.mail/mail javax.jms/jms
-                               com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]])
+                               com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]]
+  :aliases {"test!" ["do" "clean," "deps," "test"]}
+  :aot :all
+  :warn-on-reflection true)
