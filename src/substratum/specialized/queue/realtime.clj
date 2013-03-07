@@ -7,8 +7,6 @@
             IPersistentStack Counted IPersistentCollection IEditableCollection
             Cons PersistentList]))
 
-(set! *warn-on-reflection* true)
-
 (deftype RealTimeQueue [a b c d e f])
 
 (declare exec exec-seq)
@@ -65,7 +63,8 @@
   Object
   (equals [this x] (seq/equiv-sequential this x))
   (hashCode [this] (hash/hash! this hash/hash-list __hash))
-  (toString [_] (str (seq/seq->str front) ", " (seq/seq->str rear) ", " (seq/seq->str acc)))
+  ;;(toString [_] (str (seq/seq->str front) ", " (seq/seq->str rear) ", " (seq/seq->str acc)))
+  (toString [_] (str front) ", " (str rear) ", " (str acc))
   IObj
   (meta [_] meta)
   (withMeta [_ meta] (RealTimeQueue. meta cnt front rear acc __hash))
@@ -86,26 +85,32 @@
   (count [_] cnt)
   (empty [_] (EmptyRealTimeQueue. meta))
   (equiv [this x] (.equals this x))
-  (cons [_ x] (exec meta (inc cnt) front (conj rear x) acc)))
+  (cons [_ x] (exec meta (inc cnt) front (cons x rear) acc)))
 
-(defn- rotate [[x & xs] [y & ys] acc]
-  (if (and (nil? x) (nil? xs))
-    (lazy-seq (cons y acc))
-    (lazy-seq (cons x (rotate xs ys (lazy-seq (cons y acc)))))))
+(defn- rotate [xs ys acc]
+    (let [y (first ys)]
+      (if (nil? xs)
+        (lazy-seq (cons y acc))
+        (let [x (first xs)
+              xs (next xs)
+              ys (next ys)]
+          (lazy-seq (cons x (rotate xs ys (lazy-seq (cons y acc)))))))))
 
 (defn- exec
-  [meta cnt front rear [a & s]]
-  (if (and (nil? a) (nil? s))
+  [meta cnt front rear acc]
+  (if (nil? acc)
     (let [rot (rotate front rear nil)]
       (RealTimeQueue. meta cnt rot nil rot nil))
-    (RealTimeQueue. meta cnt front rear s nil)))
+    (RealTimeQueue. meta cnt front rear (next acc) nil)))
 
 (defn- exec-seq
-  [meta front rear [a & s]]
-  (if (and (nil? a) (nil? s))
-    (let [rot (rotate front rear nil)]
-      (RealTimeQueueSeq. meta rot nil rot nil))
-    (RealTimeQueueSeq. meta front rear s nil)))
+  [meta front rear acc]
+  (let [a (first acc)
+        acc (next acc)]
+    (if (and (nil? a) (nil? acc))
+      (let [rot (rotate front rear nil)]
+        (RealTimeQueueSeq. meta rot nil rot nil))
+      (RealTimeQueueSeq. meta front rear acc nil))))
 
 (def empty-queue
   (EmptyRealTimeQueue. nil))
@@ -114,5 +119,3 @@
   ([] empty-queue)
   ([& args]
      (apply into empty-queue args)))
-
-(set! *warn-on-reflection* false)
