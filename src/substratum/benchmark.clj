@@ -28,7 +28,7 @@ forced in the expression to get an accurate timing."
               cnt (inc cnt)]
           (recur xs sum sumsq hi lo cnt))
         (let [mean (/ sum cnt)
-              variance (Math/abs (- (/ sumsq cnt) mean))]
+              variance (Math/abs (double (- (/ sumsq cnt) mean)))]
           {:sum sum :sum-squares sumsq :max hi :min lo :count cnt
            :mean (/ sum cnt) :variance variance :std-dev (Math/sqrt (double variance))})))))
 

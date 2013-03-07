@@ -30,8 +30,9 @@ and stores the new value."
   (loop [h 0 s (seq m)]
     (if s
       (let [e (first s)]
-        (recur (mod (+ h (bit-xor (hash (key e)) (hash (val e))))
-                    4503599627370496)
+        (recur (unchecked-long
+                (mod (+ h (bit-xor (hash (key e)) (hash (val e))))
+                     4503599627370496))
                (next s)))
       h)))
 
@@ -40,6 +41,7 @@ and stores the new value."
   (loop [h 0 s (seq s)]
     (if s
       (let [e (first s)]
-        (recur (mod (+ h (hash e)) 4503599627370496)
+        (recur (unchecked-long
+                (mod (+ h (hash e)) 4503599627370496))
                (next s)))
       h)))
