@@ -2,8 +2,6 @@
   (:use [substratum.core])
   (:require [clojure.set :as set]))
 
-(set! *warn-on-reflection* true)
-
 (defn all-interfaces
   "Returns a sorted list of all interfaces implemented by the class or any
 class above it in the hierarchy."
@@ -18,5 +16,3 @@ class above it in the hierarchy."
   (sort-by #(.getName ^Class %)
            (filter (fn [^Class x] (not (.isInterface x)))
                    (supers class))))
-
-(set! *warn-on-reflection* false)

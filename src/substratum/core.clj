@@ -1,8 +1,6 @@
 (ns substratum.core
   "A set of ubiquitous functions")
 
-(set! *warn-on-reflection* true)
-
 ;; # Variants of `def` forms.
 
 (defmacro def-
@@ -59,5 +57,4 @@ a collection."
          (apply concat
                 (apply map f colls))))
 
-(set! *warn-on-reflection* false)
 

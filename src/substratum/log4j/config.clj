@@ -16,8 +16,6 @@
            [java.net URI URL]
            [java.io File OutputStream Writer]))
 
-(set! *warn-on-reflection* true)
-
 (def levels
   "Log level mapping for Log4j"
   {:all   Level/ALL
@@ -266,5 +264,3 @@ default logger for the namespace is used."
      `(-set-additivity! ~logger ~additive?)))
 
 ;;TODO Thread-Local Loggers
-
-(set! *warn-on-reflection* false)
