@@ -1,6 +1,7 @@
 (ns substratum.specialized.queue.perf
   (:refer-clojure :exclude [load])
-  (:use [substratum.core])
+  (:use [substratum.core]
+        [clojure.test])
   (:require [substratum.benchmark :as bm]
             [substratum.specialized.queue.batched :as batched]
             [substratum.specialized.queue.realtime :as realtime])
@@ -59,3 +60,28 @@
      (let [v (vec (repeat size -val))]
       (-report-on-all colls n m #(count (-dump (-into %1 v)))))))
 
+(defn dump
+  ([colls _ n]
+     (-report-on-all colls n #(count (-dump %1))))
+  ([colls _ n m]
+     (-report-on-all colls n m #(count (-dump %1)))))
+
+(defn head-to-head
+  [one two op size n m name1 name2]
+  (let [tone (simple-name (type one))
+        ttwo (simple-name (type two))
+        results (op [one two] size n m)
+        om95 (:mean95 ((keyword tone) results))
+        tm95 (:mean95 ((keyword ttwo) results))]
+    (println (format "%s vs. %s, Size = %s" (or name1 tone) (or name2 ttwo) size))
+    (println (format "%s: %.5fms" name1 (/ om95 m)))
+    (println (format "%s: %.5fms" name2 (/ tm95 m)))
+    (if (< om95 tm95)
+      (println (format "Speedup: x%.5f" (/ tm95 om95)))
+      (println (format "Slowdown: x%.5f" (/ om95 tm95))))
+    (println)))
+
+(deftest realtime-vs-batched
+  (head-to-head realtime/empty-queue batched/empty-queue load-and-dump 20 100000 1000 "RealTime" "Batched")
+  (head-to-head realtime/empty-queue batched/empty-queue load-and-dump 2 100000 1000 "RealTime" "Batched")
+  (head-to-head realtime/empty-queue batched/empty-queue load-and-dump 2000 1000 10 "RealTime" "Batched"))
